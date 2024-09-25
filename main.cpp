@@ -1,4 +1,4 @@
-#include <SDL2/SDL.h> 
+#include <SDL2/SDL.h>
 #include <iostream>
 #include <vector>
 #include <cstdlib>
@@ -157,23 +157,27 @@ int main(int argc, char* argv[]) {
         }
 
         // Rendu
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Fond blanc
         SDL_RenderClear(renderer);
 
         // Dessiner le serpent
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Serpent vert
         for (size_t i = 0; i < snake.body.size(); ++i) {
             SDL_Rect rect = { snake.body[i].x, snake.body[i].y, SNAKE_SIZE, SNAKE_SIZE };
             SDL_RenderFillRect(renderer, &rect);
         }
 
-        // Dessiner les pommes
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        // Dessiner les pommes avec un effet de bordure pour rendre un aspect physique
         for (size_t i = 0; i < apples.size(); ++i) {
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Rouge pour le corps des pommes
             SDL_Rect appleRect = { apples[i].x, apples[i].y, SNAKE_SIZE, SNAKE_SIZE };
             SDL_RenderFillRect(renderer, &appleRect);
+
+            // Dessiner une bordure noire autour des pommes
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderDrawRect(renderer, &appleRect);
         }
-A
+
         SDL_RenderPresent(renderer);
         SDL_Delay(100); // Vitesse du jeu
     }

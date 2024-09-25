@@ -1,4 +1,4 @@
-#include <SDL2/SDL.h>
+#include <SDL2/SDL.h> 
 #include <iostream>
 #include <vector>
 #include <cstdlib>
@@ -9,6 +9,7 @@ const int WINDOW_WIDTH = 640;
 const int WINDOW_HEIGHT = 480;
 const int SNAKE_SIZE = 20; // Taille du serpent et des pommes
 const int INITIAL_LENGTH = 3;
+const int NUM_APPLES = 3;  // Nombre de pommes à générer
 
 enum Direction { UP, DOWN, LEFT, RIGHT };
 
@@ -36,20 +37,26 @@ bool checkCollision(const Snake& snake) {
     return false;
 }
 
-void generateApple(Apple& apple, const Snake& snake) {
-    bool validPosition;
-    do {
-        validPosition = true;
-        apple.x = (rand() % (WINDOW_WIDTH / SNAKE_SIZE)) * SNAKE_SIZE;
-        apple.y = (rand() % (WINDOW_HEIGHT / SNAKE_SIZE)) * SNAKE_SIZE;
+void generateApples(std::vector<Apple>& apples, const Snake& snake) {
+    apples.clear();
+    for (int i = 0; i < NUM_APPLES; ++i) {
+        Apple apple;
+        bool validPosition;
+        do {
+            validPosition = true;
+            apple.x = (rand() % (WINDOW_WIDTH / SNAKE_SIZE)) * SNAKE_SIZE;
+            apple.y = (rand() % (WINDOW_HEIGHT / SNAKE_SIZE)) * SNAKE_SIZE;
 
-        for (size_t i = 0; i < snake.body.size(); ++i) {
-            if (apple.x == snake.body[i].x && apple.y == snake.body[i].y) {
-                validPosition = false;
-                break;
+            // Vérifier que la pomme ne se trouve pas sur le serpent
+            for (size_t j = 0; j < snake.body.size(); ++j) {
+                if (apple.x == snake.body[j].x && apple.y == snake.body[j].y) {
+                    validPosition = false;
+                    break;
+                }
             }
-        }
-    } while (!validPosition);
+        } while (!validPosition);
+        apples.push_back(apple);
+    }
 }
 
 void moveSnake(Snake& snake) {
@@ -98,15 +105,17 @@ int main(int argc, char* argv[]) {
 
     Snake snake;
     for (int i = 0; i < INITIAL_LENGTH; ++i) {
-		SDL_Point newSegment;
-		newSegment.x = INITIAL_LENGTH * SNAKE_SIZE - i * SNAKE_SIZE;
-		newSegment.y = 0;
-		snake.body.push_back(newSegment);
+        SDL_Point newSegment;
+        newSegment.x = INITIAL_LENGTH * SNAKE_SIZE - i * SNAKE_SIZE;
+        newSegment.y = 0;
+        snake.body.push_back(newSegment);
     }
     snake.dir = RIGHT;
 
-    Apple apple;
-    generateApple(apple, snake);
+    std::vector<Apple> apples;
+    generateApples(apples, snake);
+
+    int applesEaten = 0; // Compteur de pommes mangées
 
     bool running = true;
     SDL_Event event;
@@ -132,9 +141,19 @@ int main(int argc, char* argv[]) {
         }
 
         // Vérifier si le serpent mange une pomme
-        if (snake.body[0].x == apple.x && snake.body[0].y == apple.y) {
-            growSnake(snake);
-            generateApple(apple, snake);
+        for (size_t i = 0; i < apples.size(); ++i) {
+            if (snake.body[0].x == apples[i].x && snake.body[0].y == apples[i].y) {
+                growSnake(snake);
+                apples.erase(apples.begin() + i); // Supprimer la pomme mangée
+                applesEaten++; // Incrémenter le compteur de pommes mangées
+                break;
+            }
+        }
+
+        // Si le serpent a mangé les 3 pommes, régénérer 3 nouvelles pommes
+        if (applesEaten == NUM_APPLES) {
+            applesEaten = 0;
+            generateApples(apples, snake);
         }
 
         // Rendu
@@ -148,11 +167,13 @@ int main(int argc, char* argv[]) {
             SDL_RenderFillRect(renderer, &rect);
         }
 
-        // Dessiner la pomme
+        // Dessiner les pommes
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_Rect appleRect = { apple.x, apple.y, SNAKE_SIZE, SNAKE_SIZE };
-        SDL_RenderFillRect(renderer, &appleRect);
-
+        for (size_t i = 0; i < apples.size(); ++i) {
+            SDL_Rect appleRect = { apples[i].x, apples[i].y, SNAKE_SIZE, SNAKE_SIZE };
+            SDL_RenderFillRect(renderer, &appleRect);
+        }
+A
         SDL_RenderPresent(renderer);
         SDL_Delay(100); // Vitesse du jeu
     }

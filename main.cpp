@@ -80,6 +80,19 @@ void growSnake(Snake& snake) {
     snake.body.push_back(newTail);
 }
 
+void renderCircle(SDL_Renderer* renderer, int x, int y, int radius, SDL_Color color) {
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    for (int w = 0; w < radius * 2; w++) {
+        for (int h = 0; h < radius * 2; h++) {
+            int dx = radius - w; // Horizontal distance to center
+            int dy = radius - h; // Vertical distance to center
+            if ((dx * dx + dy * dy) <= (radius * radius)) {
+                SDL_RenderDrawPoint(renderer, x + dx, y + dy);
+            }
+        }
+    }
+}
+
 int main(int argc, char* argv[]) {
     srand(static_cast<unsigned>(time(0)));
 
@@ -160,22 +173,17 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Fond blanc
         SDL_RenderClear(renderer);
 
-        // Dessiner le serpent
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Serpent vert
-        for (size_t i = 0; i < snake.body.size(); ++i) {
-            SDL_Rect rect = { snake.body[i].x, snake.body[i].y, SNAKE_SIZE, SNAKE_SIZE };
-            SDL_RenderFillRect(renderer, &rect);
+        // Dessiner le serpent (circulaire)
+        SDL_Color snakeColor = { 0, 255, 0, 255 }; // Vert
+        renderCircle(renderer, snake.body[0].x + SNAKE_SIZE / 2, snake.body[0].y + SNAKE_SIZE / 2, SNAKE_SIZE / 2, snakeColor); // Tête
+        for (size_t i = 1; i < snake.body.size(); ++i) {
+            renderCircle(renderer, snake.body[i].x + SNAKE_SIZE / 2, snake.body[i].y + SNAKE_SIZE / 2, SNAKE_SIZE / 2, snakeColor); // Corps
         }
 
-        // Dessiner les pommes avec un effet de bordure pour rendre un aspect physique
+        // Dessiner les pommes
+        SDL_Color appleColor = { 255, 0, 0, 255 }; // Rouge
         for (size_t i = 0; i < apples.size(); ++i) {
-            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Rouge pour le corps des pommes
-            SDL_Rect appleRect = { apples[i].x, apples[i].y, SNAKE_SIZE, SNAKE_SIZE };
-            SDL_RenderFillRect(renderer, &appleRect);
-
-            // Dessiner une bordure noire autour des pommes
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-            SDL_RenderDrawRect(renderer, &appleRect);
+            renderCircle(renderer, apples[i].x + SNAKE_SIZE / 2, apples[i].y + SNAKE_SIZE / 2, SNAKE_SIZE / 2, appleColor);
         }
 
         SDL_RenderPresent(renderer);

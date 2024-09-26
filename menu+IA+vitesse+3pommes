@@ -152,8 +152,6 @@ void moveSnakeAI(Snake& snake, const std::vector<Apple>& apples) {
     }
 }
 
-#include <fstream>
-
 // Fonction pour sauvegarder l'état du jeu
 void saveGame(const Snake& snake, const std::vector<Apple>& apples, int applesEaten, int speed) {
     std::ofstream saveFile("savegame.txt");
@@ -276,8 +274,8 @@ int main(int argc, char* argv[]) {
     bool inMenu = true;
     SDL_Event event;
     int choice = 0; // 0 = pas encore choisi, 1 = jouer, 2 = IA, 3 = vitesse
-    int speed = 1;  // Vitesse par défaut
-    int delayTime = 150; // Délai par défaut pour vitesse lente
+	int speed = 1; // 1 = lent, 2 = rapide
+	int delayTime = (speed == 1) ? 150 : 75; // Durée d'attente en millisecondes
     int applesEaten = 0; // Compteur de pommes mangées
 
     while (running) {
@@ -298,7 +296,6 @@ int main(int argc, char* argv[]) {
                             inMenu = false;
                             break;
                         case SDLK_3: // Choisir la vitesse
-                            // Gérer le choix de vitesse ici
                             break;
                     }
                 }
@@ -324,6 +321,8 @@ int main(int argc, char* argv[]) {
                             case SDLK_DOWN:  if (snake.dir != UP) snake.dir = DOWN; break;
                             case SDLK_LEFT:  if (snake.dir != RIGHT) snake.dir = LEFT; break;
                             case SDLK_RIGHT: if (snake.dir != LEFT) snake.dir = RIGHT; break;
+                            case SDLK_1: speed = 1; delayTime = 150; break; // Vitesse 1
+                    		case SDLK_2: speed = 2; delayTime = 75; break;   // Vitesse 2
                         }
                     }
                 }
@@ -371,6 +370,7 @@ int main(int argc, char* argv[]) {
 
                 SDL_RenderPresent(renderer);
                 SDL_Delay(delayTime); // Contrôler la vitesse
+               // Définir la vitesse initiale (1 ou 2)
             }
         }
     }

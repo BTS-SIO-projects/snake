@@ -120,9 +120,9 @@ void displayMenu(SDL_Renderer* renderer, TTF_Font* font) {
     SDL_Color white = {255, 255, 255, 255}; // Blanc
 
     // Afficher les options du menu
-    renderText(renderer, font, "1. Jouer", white, 100, 100);
+    renderText(renderer, font, "1. Jouer !", white, 100, 100);
     renderText(renderer, font, "2. Laisser l'ordinateur jouer", white, 100, 200);
-    renderText(renderer, font, "3. Choisir la vitesse", white, 100, 300);
+    renderText(renderer, font, "3. Charger une partie récente", white, 100, 300);
 
     SDL_RenderPresent(renderer); // Afficher les options du menu
 }
@@ -277,7 +277,8 @@ int main(int argc, char* argv[]) {
 	int speed = 1; // 1 = lent, 2 = rapide
 	int delayTime = (speed == 1) ? 150 : 75; // Durée d'attente en millisecondes
     int applesEaten = 0; // Compteur de pommes mangées
-
+	Snake snake;  // Le serpent est maintenant défini ici
+    std::vector<Apple> apples;
     while (running) {
         if (inMenu) {
             displayMenu(renderer, font);
@@ -290,26 +291,45 @@ int main(int argc, char* argv[]) {
                         case SDLK_1: // Jouer
                             choice = 1;
                             inMenu = false;
+                            // Initialiser le serpent pour une nouvelle partie
+                            snake.dir = RIGHT; 
+                            for (int i = 0; i < INITIAL_LENGTH; ++i) {
+                                snake.body.push_back({INITIAL_LENGTH * SNAKE_SIZE - (i * SNAKE_SIZE), 0});
+                            }
+                            generateApples(apples, snake);
                             break;
                         case SDLK_2: // Laisser l'IA jouer
                             choice = 2;
                             inMenu = false;
+                            // Initialiser le serpent pour une nouvelle partie
+                            snake.dir = RIGHT;
+                            for (int i = 0; i < INITIAL_LENGTH; ++i) {
+                                snake.body.push_back({INITIAL_LENGTH * SNAKE_SIZE - (i * SNAKE_SIZE), 0});
+                            }
+                            generateApples(apples, snake);
                             break;
-                        case SDLK_3: // Choisir la vitesse
-                            break;
+                        case SDLK_3: // Reprendre la partie récente
+                        	// Essayer de charger une partie sauvegardée
+	                        if (!loadGame(snake, apples, applesEaten, speed)) {
+	                            std::cout << "Aucun partie récente trouvée." << std::endl;
+	                        } else {
+	                            choice = 1; // Charger le jeu et commencer à jouer
+	                            inMenu = false;
+	                        }
+						break;
                     }
                 }
             }
         } else {
-            Snake snake;
+   /*         Snake snake;
             snake.dir = RIGHT; // Direction initiale
             for (int i = 0; i < INITIAL_LENGTH; ++i) {
                 snake.body.push_back({INITIAL_LENGTH * SNAKE_SIZE - (i * SNAKE_SIZE), 0});
             }
 
             std::vector<Apple> apples;
-            generateApples(apples, snake);
-
+            generateApples(apples, snake); */
+			
             while (running) {
                 while (SDL_PollEvent(&event)) {
                     if (event.type == SDL_QUIT) {
@@ -323,6 +343,7 @@ int main(int argc, char* argv[]) {
                             case SDLK_RIGHT: if (snake.dir != LEFT) snake.dir = RIGHT; break;
                             case SDLK_1: speed = 1; delayTime = 150; break; // Vitesse 1
                     		case SDLK_2: speed = 2; delayTime = 75; break;   // Vitesse 2
+						    case SDLK_s: saveGame(snake, apples, applesEaten, speed); break; // Sauvegarder la partie 				            
                         }
                     }
                 }

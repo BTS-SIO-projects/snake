@@ -291,7 +291,6 @@ int main(int argc, char* argv[]) {
                         case SDLK_1: // Jouer
                             choice = 1;
                             inMenu = false;
-                            // Initialiser le serpent pour une nouvelle partie
                             snake.dir = RIGHT; 
                             for (int i = 0; i < INITIAL_LENGTH; ++i) {
                                 snake.body.push_back({INITIAL_LENGTH * SNAKE_SIZE - (i * SNAKE_SIZE), 0});
@@ -311,7 +310,7 @@ int main(int argc, char* argv[]) {
                         case SDLK_3: // Reprendre la partie récente
                         	// Essayer de charger une partie sauvegardée
 	                        if (!loadGame(snake, apples, applesEaten, speed)) {
-	                            std::cout << "Aucun partie récente trouvée." << std::endl;
+	                            std::cout << "Aucun partie récente trouvé." << std::endl;
 	                        } else {
 	                            choice = 1; // Charger le jeu et commencer à jouer
 	                            inMenu = false;

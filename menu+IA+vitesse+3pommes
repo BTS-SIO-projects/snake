@@ -277,8 +277,10 @@ int main(int argc, char* argv[]) {
 	int speed = 1; // 1 = lent, 2 = rapide
 	int delayTime = (speed == 1) ? 150 : 75; // Durée d'attente en millisecondes
     int applesEaten = 0; // Compteur de pommes mangées
+    
 	Snake snake;  // Le serpent est maintenant défini ici
     std::vector<Apple> apples;
+    
     while (running) {
         if (inMenu) {
             displayMenu(renderer, font);
@@ -291,7 +293,8 @@ int main(int argc, char* argv[]) {
                         case SDLK_1: // Jouer
                             choice = 1;
                             inMenu = false;
-                            snake.dir = RIGHT; 
+                            snake.dir = RIGHT;
+                            snake.body.clear();
                             for (int i = 0; i < INITIAL_LENGTH; ++i) {
                                 snake.body.push_back({INITIAL_LENGTH * SNAKE_SIZE - (i * SNAKE_SIZE), 0});
                             }
@@ -300,8 +303,8 @@ int main(int argc, char* argv[]) {
                         case SDLK_2: // Laisser l'IA jouer
                             choice = 2;
                             inMenu = false;
-                            // Initialiser le serpent pour une nouvelle partie
                             snake.dir = RIGHT;
+                            snake.body.clear();
                             for (int i = 0; i < INITIAL_LENGTH; ++i) {
                                 snake.body.push_back({INITIAL_LENGTH * SNAKE_SIZE - (i * SNAKE_SIZE), 0});
                             }
@@ -320,15 +323,15 @@ int main(int argc, char* argv[]) {
                 }
             }
         } else {
-   /*         Snake snake;
+      /*      Snake snake;
             snake.dir = RIGHT; // Direction initiale
             for (int i = 0; i < INITIAL_LENGTH; ++i) {
                 snake.body.push_back({INITIAL_LENGTH * SNAKE_SIZE - (i * SNAKE_SIZE), 0});
             }
 
             std::vector<Apple> apples;
-            generateApples(apples, snake); */
-			
+            generateApples(apples, snake); 
+			*/
             while (running) {
                 while (SDL_PollEvent(&event)) {
                     if (event.type == SDL_QUIT) {
@@ -355,7 +358,9 @@ int main(int argc, char* argv[]) {
 
                 // Vérifier les collisions
                 if (checkCollision(snake)) {
-                    running = false; // Fin de la partie
+					std::cout << "Game Over!" << std::endl;
+                    inMenu = true; // Retourner au menu après la fin de la partie
+                    break;
                 }
 
                 // Vérifier si le serpent mange une pomme

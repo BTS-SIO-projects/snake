@@ -10,3 +10,5 @@ Nous avons programmé la possibilité de laisser l’ordinateur jouer, et ce ave
 Pour faire fonctionner le jeu, veuillez installer la bibliothèque SDL https://github.com/libsdl-org/SDL/releases/tag/release-2.30.7.
 
 Configurez votre IDE (nous avons utilisé Dev C++) pour la relier à SDL puis compiler votre projet !
+
+[Présentation](https://www.canva.com/design/DAGRTHiahro/lLG0kSWT3KC-rBNPf4bbdw/edit)
